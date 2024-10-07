@@ -8,8 +8,36 @@ return {
   {
     "williamboman/mason-lspconfig.nvim",
     config = function()
+      local lspconfig = require('lspconfig')
+
       require("mason-lspconfig").setup({
-        ensure_installed = { "clangd" }
+        ensure_installed = { 
+          "ts_ls",
+          "clangd",
+          "marksman",
+          "tailwindcss",
+          "html",
+          "cssls",
+          "jsonls"
+        },
+
+        handlers = {
+          function(server)
+            lspconfig[server].setup({
+              capabilities = lsp_capabilities,
+            })
+          end,
+          ['ts_ls'] = function()
+            lspconfig.ts_ls.setup({
+              capabilities = lsp_capabilities,
+              settings = {
+                completions = {
+                  completeFunctionCalls = true
+                }
+              }
+            })
+          end
+        }
       })
     end
   },
@@ -17,10 +45,7 @@ return {
     "neovim/nvim-lspconfig",
     config = function()
       local capabilities = require("cmp_nvim_lsp").default_capabilities()
-      local lspconfig = require("lspconfig")
-      lspconfig.clangd.setup({
-        capabilities = capabilities
-      })
+
       vim.keymap.set("n", "K", vim.lsp.buf.hover, {})
       vim.keymap.set("n", "gd", vim.lsp.buf.definition, {})
     end
